@@ -25,3 +25,6 @@ _testmain.go
 
 # build artifacts
 monkey-go
+
+# vim
+*.swp
