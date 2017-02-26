@@ -31,7 +31,7 @@ func (p *Parser) ParseProgram() *ast.Program {
     program := &ast.Program{}
     program.Statements = []ast.Statement{}
 
-    for p.curToken.Type != token.EOF {
+    for !p.curTokenIs(token.EOF) {
         stmt := p.parseStatement()
         if stmt != nil {
             program.Statements = append(program.Statements, stmt)
@@ -66,15 +66,23 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
     
     // mvp implementation to satisfy our tests
     // keep skipping until semicolon
-    for p.curToken.Type != token.SEMICOLON {
+    for !p.curTokenIs(token.SEMICOLON) {
         p.nextToken()
     }
 
     return stmt
 }
 
+func (p *Parser) curTokenIs(t token.TokenType) bool {
+    return p.curToken.Type == t
+}
+
+func (p *Parser) peekTokenIs(t token.TokenType) bool {
+    return p.peekToken.Type == t
+}
+
 func (p *Parser) expectPeek(t token.TokenType) bool {
-    if p.peekToken.Type == t {
+    if p.peekTokenIs(t) {
         p.nextToken()
         return true
     } else {
