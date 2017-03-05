@@ -6,6 +6,45 @@ import (
     "github.com/josketres/monkey-go/lexer"
 )
 
+func TestReturnStatement(t *testing.T) {
+    input := `
+    return 5; 
+    return 10; 
+    return 993322; 
+    `
+    l := lexer.New(input)
+    p := New(l)
+
+    program := p.ParseProgram()
+    checkParserErrors(t, p)
+    if program == nil {
+        t.Fatalf("ParseProgram() returned nil")
+    }
+    if length := len(program.Statements); length != 3 {
+        t.Fatalf("program.Statements does not contain 3 statements. got=%d", length)
+    }
+
+    for _, stmt := range program.Statements {
+        if !testReturnStatement(t, stmt) {
+            return
+        }
+    }
+
+}
+
+func testReturnStatement(t *testing.T, s ast.Statement) bool {
+    if tl := s.TokenLiteral(); tl != "return" {
+        t.Errorf("s.TokenLiteral() not 'return'. got=%q", tl)
+        return false
+    }
+    _, ok := s.(*ast.ReturnStatement)
+    if !ok {
+        t.Errorf("s not *ast.ReturnStatement. got=%T", s)
+        return false
+    }
+    return true
+}
+
 func TestLetStatements(t *testing.T) {
     input := `
     let x = 5;
@@ -39,6 +78,7 @@ func TestLetStatements(t *testing.T) {
             return
         }
     }
+
 }
 
 func checkParserErrors(t *testing.T, p *Parser) {
